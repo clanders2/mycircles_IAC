@@ -2,11 +2,35 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS infrastructure for web, API, and data layer
 
 Resources:
+  # Amazon VPC
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+
+  # Amazon VPC Subnets
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: 10.0.1.0/24
+      VpcId: !Ref VPC
+
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [1, !GetAZs '']
+      CidrBlock: 10.0.2.0/24
+      VpcId: !Ref VPC
+
   # Amazon S3
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: mycircles4u.com
+      BucketName: your-s3-bucket-name
 
   # Amazon RDS
   RDSInstance:
@@ -26,8 +50,8 @@ Resources:
     Properties:
       DBSubnetGroupDescription: Subnet group for RDS instance
       SubnetIds:
-        - subnet-id-1
-        - subnet-id-2
+        - !Ref Subnet1
+        - !Ref Subnet2
 
   # Amazon EC2
   EC2LaunchTemplate:
@@ -51,8 +75,8 @@ Resources:
       MaxSize: 5
       DesiredCapacity: 2
       VPCZoneIdentifier:
-        - subnet-id-1
-        - subnet-id-2
+        - !Ref Subnet1
+        - !Ref Subnet2
 
   # Amazon CloudFront
   CloudFrontDistribution:
@@ -78,15 +102,18 @@ Resources:
     Properties:
       Scheme: internet-facing
       Subnets:
-        - subnet-id-1
-        - subnet-id-2
+        - !Ref Subnet1
+        - !Ref Subnet2
       Type: application
 
-  # Amazon API Gateway
+#  Amazon API Gateway
+  RestApi:
+    Type: AWS  
+# Amazon API Gateway
   RestApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: your-api-name
+      Name: PeopleCardAPI
 
   # AWS Identity and Access Management (IAM)
   IAMRole:
