@@ -6,7 +6,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: your-s3-bucket-name
+      BucketName: mycircles4u.com
 
   # Amazon RDS
   RDSInstance:
